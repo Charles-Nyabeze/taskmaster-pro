@@ -44,6 +44,10 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+
+
+
+
 $(".list-group").on("click", "p", function() {
   // get the textarea's current value/text
 var text = $(this)
@@ -100,25 +104,33 @@ $("#task-form-modal .btn-primary").click(function() {
   }
 });
 
-// due date was clicked
-$(".list-group").on("click", "span", function() {
-  // get current text
-  var date = $(this)
-    .text()
-    .trim();
+// editable field was un-focused
+$(".list-group").on("blur", "textarea", function() {
+  // get current value of textarea
+  var text = $(this).val();
 
-  // create new input element
-  var dateInput = $("<input>")
-    .attr("type", "text")
-    .addClass("form-control")
-    .val(date);
+  // get status type and position in the list
+  var status = $(this)
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
+  var index = $(this)
+    .closest(".list-group-item")
+    .index();
 
-  // swap out elements
-  $(this).replaceWith(dateInput);
+  // update task in array and re-save to localstorage
+  tasks[status][index].text = text;
+  saveTasks();
 
-  // automatically focus on new element
-  dateInput.trigger("focus");
+  // recreate p element
+  var taskP = $("<p>")
+    .addClass("m-1")
+    .text(text);
+
+  // replace textarea with new content
+  $(this).replaceWith(taskP);
 });
+
 
 // value of due date was changed
 $(".list-group").on("blur", "input[type='text']", function() {
